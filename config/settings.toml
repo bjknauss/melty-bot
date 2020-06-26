@@ -1,0 +1,11 @@
+[development]
+db_uri = 'mongodb://localhost:27017/'
+db_name = 'melty-dev'
+
+[production]
+db_uri = 'mongodb://localhost:27017/'
+db_name = 'melty'
+
+[default]
+owner = 271084790952755201
+command_prefix = '*'

@@ -1,0 +1,2 @@
+class MeltyError(Exception):
+    pass
