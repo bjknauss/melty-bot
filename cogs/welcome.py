@@ -31,7 +31,7 @@ class WelcomeSettings:
 
     def __init__(self, **kwargs):
         self.guild_id = kwargs.get('guild_id')
-        self._message = kwargs.get('message', '')
+        self.message = kwargs.get('message', '')
         self.channel_id = kwargs.get('channel_id')
 
     @property
@@ -54,8 +54,10 @@ class WelcomeSettings:
             return True
         return False
 
-    async def post_welcome_message(self, member: Member):
-        channel = self.get_channel(member)
+    async def post_welcome_message(self,
+                                   member: Member,
+                                   channel: Optional[TextChannel] = None):
+        channel = channel if channel else self.get_channel(member.guild)
 
         if channel and self.has_message():
             msg = self.get_welcome_message(member)
@@ -80,6 +82,20 @@ class Welcome(Cog):
 
         await welcome_setting.post_welcome_message(member)
 
+    def get_or_create_ws(self, guild_id):
+        ws = self.settings[guild_id]
+        if not ws:
+            ws = WelcomeSettings(guild_id=guild_id)
+
+        return ws
+
+    @command()
+    async def set_welcome_channel(self, ctx: Context, channel: TextChannel):
+        ws = self.get_or_create_ws(ctx.guild.id)
+        ws.channel_id = channel.id
+        self.save_welcome_settings(ws)
+        await ctx.send('Channel updated.')
+
     @command()
     async def view_welcome_message(self, ctx: Context):
         welcome_settings = self.settings[ctx.guild.id]
@@ -87,7 +103,8 @@ class Welcome(Cog):
         if not welcome_settings or not welcome_settings.template:
             await ctx.send('No welcome message set yet!')
         else:
-            await welcome_settings.post_welcome_message(ctx.author)
+            await welcome_settings.post_welcome_message(
+                ctx.author, ctx.channel)
 
     @command()
     async def view_welcome_variables(self, ctx: Context):
