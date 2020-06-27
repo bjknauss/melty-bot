@@ -139,11 +139,11 @@ class Welcome(Cog):
             welcome_setting = WelcomeSettings(guild_id=ctx.guild.id,
                                               message=message)
         try:
-            welcome_setting.get_welcome_message(ctx.author)
+            welcome_message = welcome_setting.get_welcome_message(ctx.author)
             self.save_welcome_settings(welcome_setting)
 
-            await ctx.send('Updated welcome message!\nPreview:\n')
-            await ctx.send(self.m_make_welcome_messageake_welcome_message(ctx))
+            await ctx.send('Updated welcome message!\nPreview:\n\n')
+            await ctx.send(welcome_message)
 
         except KeyError:
             err_value = sys.exc_info()[1]
